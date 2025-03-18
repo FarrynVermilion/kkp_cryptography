@@ -49,7 +49,7 @@ fn main() {
             
             if debugging == true {
                 println!("\nValue: {}", value);
-                println!("Length: {}", value.len());
+                println!("Length: {}", bytes.len());
                 println!("size added: {}", size);
                 for (index,byte) in bytes.iter().enumerate() {
                     println!("index: {index} \tByte: {byte:?} \thex: {byte:x} \tbit: {byte:08b} \tascii: {ch}",ch=*byte as char);
@@ -61,9 +61,29 @@ fn main() {
         result
     }
 
+    fn key_expansion(debugging: bool){
+
+    }
+    fn add_round_key(debugging: bool){
+
+    }
+    fn substitution_box(debugging: bool){
+
+    }
+    fn shift_rows(debugging: bool){
+
+    }
+    fn mix_columns(debugging: bool){
+
+    }
+
     // This is the main program that executes process
     // change value for debugging
     let debugging = true;
-    let bytes_arra = convert_input_value_to_bytes(debugging,take_input(debugging));
+    let bytes_array = convert_input_value_to_bytes(debugging,take_input(debugging));
 
+    // split key with its value
+    let key = bytes_array.get(0).unwrap();
+    let value = bytes_array.iter().skip(1).collect::<Vec<_>>();
+    print!("Key: {key:?}\nValue: {value:?}\n");
 }
