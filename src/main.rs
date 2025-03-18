@@ -61,6 +61,30 @@ fn main() {
         result
     }
 
+    fn split_byte_array_to_an_array_of_4x4_matrix(debugging: bool, bytes_array: Vec<u8>) -> Vec<[[u8;4]; 4]> {
+        let mut result=Vec::new();
+        let array_matrix = bytes_array.chunks(16).collect::<Vec<_>>();
+        for matrix in array_matrix {
+            let mut matrix_2d = [[0;4]; 4];
+            for i in 0..4 {
+                for j in 0..4 {
+                    matrix_2d[j][i] = matrix[i*4 + j];
+                }
+            }
+            result.push(matrix_2d);
+        }
+        if debugging == true {
+            for (index,matrix) in result.iter().copied().enumerate() {
+                println!("\nmatrix ke : {}",index+1);
+                for i in 0..4 {
+                    println!("{:?}",matrix[i]);
+                }
+            }
+        }
+
+        result
+    }
+
     fn key_expansion(debugging: bool){
 
     }
@@ -79,11 +103,19 @@ fn main() {
 
     // This is the main program that executes process
     // change value for debugging
+    // this is default value
     let debugging = true;
+
+    // take input
     let bytes_array = convert_input_value_to_bytes(debugging,take_input(debugging));
 
-    // split key with its value
+    // split key with its plain text array
     let key = bytes_array.get(0).unwrap();
-    let value = bytes_array.iter().skip(1).collect::<Vec<_>>();
-    print!("Key: {key:?}\nValue: {value:?}\n");
+    let data_array = bytes_array.iter().skip(1).collect::<Vec<_>>();
+
+    // iterate over each arg
+    for data in data_array {
+        //arg will be split to an array of 4x4 matrix
+        let matrix = split_byte_array_to_an_array_of_4x4_matrix(debugging,data.to_vec());
+    }
 }
