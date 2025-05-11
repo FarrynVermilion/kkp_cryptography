@@ -233,16 +233,16 @@ fn main() {
             [0xe1,0xf8,0x98,0x11,0x69,0xd9,0x8e,0x94,0x9b,0x1e,0x87,0xe9,0xce,0x55,0x28,0xdf],
             [0x8c,0xa1,0x89,0x0d,0xbf,0xe6,0x42,0x68,0x41,0x99,0x2d,0x0f,0xb0,0x54,0xbb,0x16]
         ];
-        // kolom
+        // kolom / col / x
         let mod16= (data as usize) % 16;
-        // baris
+        // baris / row / y
         let base16= ((data as usize)-mod16)/16;
         // ambil data substitution box
         let sub_data=sbox[base16][mod16];
         if debugging==true{
             println!("orgin\t\t:hex:{data:x}\t: dec:{data:?}");
-            println!("kolom\t\t:{mod16:x}");
             println!("baris\t\t:{base16:x}");
+            println!("kolom\t\t:{mod16:x}");
             println!("sub data\t:{sub_data:x}");
         }
         sub_data
