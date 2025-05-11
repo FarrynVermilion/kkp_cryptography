@@ -1,10 +1,11 @@
 use std::{char, env, process::exit};
 
 fn main() {
-
+    // take input fungsi buat ambil input dari terminal 
+    // kalo not with value true gk perlu ambil input buat debugginh aja
     fn take_input(not_with_value: bool) -> Vec<String> {
         //  input in rerminal example: cargo run "12345678123456781234567812345678" "You're in debugging tool with no input"
-        // first arg is the key the rest is calue for encryption with the minimum of 2 args
+        // first arg is the key the rest is value for encryption with the minimum of 2 args
         let mut result = Vec::new();
         let args: Vec<_> = env::args().collect();
         if args.len() > 1 {
@@ -41,6 +42,7 @@ fn main() {
         result
     }
 
+    // fungsi ubah input char ke byte
     fn convert_input_value_to_bytes(debugging: bool, values: Vec<String>) -> Vec<Vec<u8>> {
         let mut result:Vec<Vec<u8>>  = Vec::new();
         for value in values {
@@ -62,6 +64,7 @@ fn main() {
         result
     }
 
+    // fungsi kelompokin bytes ke array 4x4
     fn split_byte_array_to_an_array_of_4x4_matrix(debugging: bool, bytes_array: Vec<u8>) -> Vec<[[u8;4]; 4]> {
         let mut result=Vec::new();
         let array_matrix = bytes_array.chunks(16).collect::<Vec<_>>();
@@ -86,6 +89,7 @@ fn main() {
         result
     }
 
+    // fungsi utama buat key expansion
     fn key_expansion(debugging: bool, key: Vec<u8>)-> Vec<[[u8;4]; 4]> {
         let rcon: [u8;10] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36];
         let mut rkey: Vec<[[u8;4]; 4]>= Vec::new();
@@ -94,6 +98,7 @@ fn main() {
             let mut matrix1 = [[0;4]; 4];
             let mut matrix2 = [[0;4]; 4];
             match i {
+                // masukin key original
                 0 => {
                     for y in 0..4 {
                         for x in 0..4 {
@@ -102,13 +107,17 @@ fn main() {
                         }
                     }
                 },
+                // proses key expansion utama
                 1..8 => {
+                    // buat prev matrix masukin 
                     let mut prev_matrix = [[0;8]; 4];
                     for x in 0..4 {
                         prev_matrix[x] = [&rkey[i*2-2][x][..],&rkey[i*2-1][x][..]].concat().try_into().unwrap();
                     }
+                    // buat oprasi matrix per kolom beda beda
                     for y in 0..8 {
                         let mut xor_arr = [0;4];
+                        // kolom 1
                         if y == 0 {
                             let sub_data = {
                                 let mut sub_data:[u8;4]=[0;4];
@@ -131,15 +140,18 @@ fn main() {
                                     println!("sub_data\t: dec:{sd:?}\tbit:{sd:08b}", sd=sub_data[x]);
                                 }
                             }
+                        // kolom 4
                         }else if y == 4 {
                             for x in 0..4 {
                                 xor_arr[x] = substitution_box(debugging, prev_matrix[x][y-1]);
                             };
+                        // kolom selain 1 dan 4
                         }else {
                             for x in 0..4 {
                                 xor_arr[x] = prev_matrix[x][y-1];
                             }
                         }
+                        // proses xor hasil di taro di prev matrix
                         for x in 0..4 {
                             if debugging == true {
                                 println!("prev_matrix\t: dec:{p:?}\tbit:{p:08b}", p=prev_matrix[x][y]);
@@ -153,7 +165,7 @@ fn main() {
                             
                         }
                     }
-
+                    // pecah prev matrix jadi 2 4x4 matrix
                     for x in 0..4 {
                         let(a,b) = prev_matrix[x].split_at(4);
                         matrix1[x] = a.try_into().unwrap();
@@ -168,6 +180,7 @@ fn main() {
             rkey.push(matrix2);
             
         }
+        // print rkey
         if debugging == true {
             println!("RCON: {rcon:?}");
             for (index,matrix) in rkey.iter().copied().enumerate() {
@@ -180,7 +193,7 @@ fn main() {
         rkey
     }
 
-
+    // shift kolom ke kiridan paling kiri ke kanan
     fn shift_columns(debugging: bool, word: [u8; 4])->[u8; 4] {
         let shifted= [word[1], word[2], word[3], word[0]];
         if debugging == true {
@@ -189,7 +202,7 @@ fn main() {
         }
         shifted
     }
-
+    // perkalian matrix xor round key dengan matrix
     fn add_round_key( matrix: [[u8;4]; 4], key: [[u8;4]; 4])->[[u8;4]; 4] {
         let mut result = [[0;4]; 4];
         for x in 0..4 {
@@ -199,6 +212,7 @@ fn main() {
         }
         result
     }
+    // substitution box
     fn substitution_box(debugging: bool, data:u8)->u8 {
 
         let sbox: [[u8; 16]; 16] = [
@@ -231,6 +245,7 @@ fn main() {
         sub_data
         
     }
+    // shift rows per baris
     fn shift_rows(matrix: [[u8; 4]; 4]) -> [[u8; 4]; 4] {
         let mut result=[[0;4];4];
         for x in 0..4 {
@@ -247,6 +262,7 @@ fn main() {
         }
         result
     }
+    // prosose mix column
     fn mix_columns(debugging: bool,matrix:[[u8; 4]; 4]) -> [[u8; 4]; 4] {
         let mut result=[[0u8; 4]; 4];
         let matrix_multiplication: [[u8; 4]; 4] = [
@@ -284,7 +300,7 @@ fn main() {
         }
         result
     }
-
+    // fungsi penghitungan irreducible polinomial
     fn gf258(x:u16,mut y:u16) -> u8 {      
         let p:u16 = 0b100011011;        
         let mut m = 0;         
@@ -302,29 +318,40 @@ fn main() {
         m as u8
   
     }
-
+    // fungsi enkripsi data matric 4x4 dengan rkey 4x4 balikin 4x4 yang sudah dienkripsi
     fn encryption(debugging: bool, mut matrix: [[u8; 4]; 4], rkeys: Vec<[[u8; 4]; 4]>) -> [[u8; 4]; 4] {
+        // iterasi per rkey
         for (i,rkey) in rkeys.iter().enumerate() {
+            // proses awal
             if i==0||i==1{
+                // proses add round key
                 matrix = add_round_key(matrix,*rkey);
             }
+            // proses last round
             else if i==rkeys.len()-1 {
+                // proses substitution box
                 for x in 0..4 {
                     for y in 0..4 {
                         matrix[x][y] = substitution_box(debugging,matrix[x][y]);
                     }
                 }
+                // proses shift rows
                 matrix = shift_rows(matrix);
+                // proses mix column
                 matrix = add_round_key(matrix,*rkey);
-
+            // proses standar
             }else{
+                // proses substitution box
                 for x in 0..4 {
                     for y in 0..4 {
                         matrix[x][y] = substitution_box(debugging,matrix[x][y]);
                     }
                 }
+                // proses shift rows
                 matrix = shift_rows(matrix);
+                // proses mix column
                 matrix = mix_columns(debugging,matrix);
+                // proses add round key
                 matrix = add_round_key(matrix,*rkey);
             }
             if debugging == true {
@@ -368,7 +395,7 @@ fn main() {
         encrypted_data_array.push(encrypted);
     }
 
-    // print result
+    // print result dalam json
     let begin = r#"{"#;
     let end = r#"}"#;
     let koma = r#","#;
