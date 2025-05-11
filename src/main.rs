@@ -1,6 +1,7 @@
 use std::{char, env, process::exit};
 
 fn main() {
+
     fn take_input(not_with_value: bool) -> Vec<String> {
         //  input in rerminal example: cargo run "12345678123456781234567812345678" "You're in debugging tool with no input"
         // first arg is the key the rest is calue for encryption with the minimum of 2 args
@@ -179,6 +180,7 @@ fn main() {
         rkey
     }
 
+
     fn shift_columns(debugging: bool, word: [u8; 4])->[u8; 4] {
         let shifted= [word[1], word[2], word[3], word[0]];
         if debugging == true {
@@ -336,7 +338,7 @@ fn main() {
     // This is the main program that executes process
     // change value for debugging
     // this is default value
-    let debugging = false;
+    let debugging = true;
     let not_with_value = true;
 
     // take input
@@ -372,10 +374,7 @@ fn main() {
     let koma = r#","#;
     println!("{begin}");
     for (index,data) in encrypted_data_array.iter().enumerate() {
-        println!("\tdata{index:?}:");
-        for matrix in data {
-            println!("\t\t{:?}{koma}",matrix);
-        }
+        println!("data{index:?}:[{:?}{koma}],",data);
     }
     println!("{end}");
 }
