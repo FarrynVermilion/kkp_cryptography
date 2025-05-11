@@ -92,6 +92,7 @@ fn main() {
     // fungsi utama buat key expansion
     fn key_expansion(debugging: bool, key: Vec<u8>)-> Vec<[[u8;4]; 4]> {
         let rcon: [u8;10] = [0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1B, 0x36];
+
         let mut rkey: Vec<[[u8;4]; 4]>= Vec::new();
 
         for i in 0..8 {
@@ -109,7 +110,7 @@ fn main() {
                 },
                 // proses key expansion utama
                 1..8 => {
-                    // buat prev matrix masukin 
+                    // buat prev matrix 8x4 nuat mempermudah penghitungan
                     let mut prev_matrix = [[0;8]; 4];
                     for x in 0..4 {
                         prev_matrix[x] = [&rkey[i*2-2][x][..],&rkey[i*2-1][x][..]].concat().try_into().unwrap();
@@ -117,7 +118,7 @@ fn main() {
                     // buat oprasi matrix per kolom beda beda
                     for y in 0..8 {
                         let mut xor_arr = [0;4];
-                        // kolom 1
+                        // kolom 0 arr yang di xor kan perlu ada shift dan s box dan di xor
                         if y == 0 {
                             let sub_data = {
                                 let mut sub_data:[u8;4]=[0;4];
@@ -140,7 +141,7 @@ fn main() {
                                     println!("sub_data\t: dec:{sd:?}\tbit:{sd:08b}", sd=sub_data[x]);
                                 }
                             }
-                        // kolom 4
+                        // kolom 5 hanya s box
                         }else if y == 4 {
                             for x in 0..4 {
                                 xor_arr[x] = substitution_box(debugging, prev_matrix[x][y-1]);
