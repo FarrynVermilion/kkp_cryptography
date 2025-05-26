@@ -402,10 +402,16 @@ fn main() {
     // print result dalam json
     let begin = r#"{"#;
     let end = r#"}"#;
-    let koma = r#","#;
-    println!("{begin}");
-    for (index,data) in encrypted_data_array.iter().enumerate() {
-        println!("data{index:?}:[{:?}{koma}],",data);
-    }
-    println!("{end}");
+    // let koma = r#","#;
+    print!("{begin} \"cyphertext\" : ");
+    // for (index,data) in encrypted_data_array.iter().enumerate() {
+    //     if index==encrypted_data_array.len()-1{
+    //         print!("{data:?}");
+    //     }
+    //     else{
+    //         print!("{data:?},");
+    //     }
+    // }
+    print!("{encrypted_data_array:?}",);
+    print!("{end}");
 }
