@@ -324,45 +324,34 @@ fn main() {
     }
     // fungsi enkripsi data matric 4x4 dengan rkey 4x4 balikin 4x4 yang sudah dienkripsi
     fn encryption(debugging: bool, mut matrix: [[u8; 4]; 4], rkeys: Vec<[[u8; 4]; 4]>) -> [[u8; 4]; 4] {
-        // iterasi per rkey
-        for (i,rkey) in rkeys.iter().enumerate() {
-            // proses awal
-            if i==0||i==1{
-                // proses add round key
-                matrix = add_round_key(matrix,*rkey);
-            }
-            // proses last round
-            else if i==rkeys.len()-1 {
-                // proses substitution box
-                for x in 0..4 {
-                    for y in 0..4 {
-                        matrix[x][y] = substitution_box(debugging,matrix[x][y]);
-                    }
+        // Initial add_round_key
+        matrix = add_round_key(matrix, rkeys[0]);
+        // 13 main rounds
+        for i in 1..(rkeys.len() - 1) {
+            // SubBytes
+            for x in 0..4 {
+                for y in 0..4 {
+                    matrix[x][y] = substitution_box(debugging, matrix[x][y]);
                 }
-                // proses shift rows
-                matrix = shift_rows(matrix);
-                // proses mix column
-                matrix = add_round_key(matrix,*rkey);
-            // proses standar
-            }else{
-                // proses substitution box
-                for x in 0..4 {
-                    for y in 0..4 {
-                        matrix[x][y] = substitution_box(debugging,matrix[x][y]);
-                    }
-                }
-                // proses shift rows
-                matrix = shift_rows(matrix);
-                // proses mix column
-                matrix = mix_columns(debugging,matrix);
-                // proses add round key
-                matrix = add_round_key(matrix,*rkey);
             }
-            if debugging == true {
-                println!("round {i}:\n{matrix:#?}\n");
-                println!("round key {i}:\n{rkey:#?}\n");
+            // ShiftRows
+            matrix = shift_rows(matrix);
+            // MixColumns
+            matrix = mix_columns(debugging, matrix);
+            // AddRoundKey
+            matrix = add_round_key(matrix, rkeys[i]);
+        }
+        // Final round (no MixColumns)
+        // SubBytes
+        for x in 0..4 {
+            for y in 0..4 {
+                matrix[x][y] = substitution_box(debugging, matrix[x][y]);
             }
         }
+        // ShiftRows
+        matrix = shift_rows(matrix);
+        // AddRoundKey
+        matrix = add_round_key(matrix, rkeys[rkeys.len() - 1]);
         matrix
     }
 
@@ -403,15 +392,25 @@ fn main() {
     let begin = r#"{"#;
     let end = r#"}"#;
     // let koma = r#","#;
-    print!("{begin} \"cyphertext\" : ");
+    print!("{begin} \"cyphertext\" : [");
     // for (index,data) in encrypted_data_array.iter().enumerate() {
-    //     if index==encrypted_data_array.len()-1{
-    //         print!("{data:?}");
+    //     print!("\"");
+    //     for matrix in data.iter() {
+    //         for row in matrix.iter() {
+    //             for col in row.iter() {
+    //                 // print!("{}",*col as char);
+    //                 i
+    //                 print!("{col:x},");
+    //             }
+    //         }
     //     }
-    //     else{
-    //         print!("{data:?},");
+    //     if index != encrypted_data_array.len()-1 {
+    //         print!("\"],\n");
+    //     }else {
+    //         print!("\"]\n");
     //     }
+        
     // }
-    print!("{encrypted_data_array:?}",);
-    print!("{end}");
+    print!("{encrypted_data_array:?}");
+    print!("]{end}\n");
 }
