@@ -358,7 +358,7 @@ fn main() {
     // This is the main program that executes process
     // change value for debugging
     // this is default value
-    let debugging = true;
+    let debugging = false;
     let not_with_value = true;
 
     // take input
@@ -392,25 +392,7 @@ fn main() {
     let begin = r#"{"#;
     let end = r#"}"#;
     // let koma = r#","#;
-    print!("{begin} \"cyphertext\" : [");
-    // for (index,data) in encrypted_data_array.iter().enumerate() {
-    //     print!("\"");
-    //     for matrix in data.iter() {
-    //         for row in matrix.iter() {
-    //             for col in row.iter() {
-    //                 // print!("{}",*col as char);
-    //                 i
-    //                 print!("{col:x},");
-    //             }
-    //         }
-    //     }
-    //     if index != encrypted_data_array.len()-1 {
-    //         print!("\"],\n");
-    //     }else {
-    //         print!("\"]\n");
-    //     }
-        
-    // }
+    print!("{begin} \"cyphertext\" : ");
     print!("{encrypted_data_array:?}");
-    print!("]{end}\n");
+    print!("{end}\n");
 }
