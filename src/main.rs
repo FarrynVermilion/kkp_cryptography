@@ -359,7 +359,7 @@ fn main() {
     // change value for debugging
     // this is default value
     let debugging = false;
-    let not_with_value = true;
+    let not_with_value = false;
 
     // take input
     let bytes_array = convert_input_value_to_bytes(debugging,take_input(not_with_value));
