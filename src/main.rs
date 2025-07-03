@@ -115,14 +115,14 @@ fn main() {
                     for x in 0..4 {
                         prev_matrix[x] = [&rkey[i*2-2][x][..],&rkey[i*2-1][x][..]].concat().try_into().unwrap();
                     }
-                    if debugging == true {
-                        println!("________________________________________________________________________");
-                        println!("prev_matrix:{prev_matrix:?}");
-                    }   
+                    
                     // buat oprasi matrix per kolom beda beda
                     for y in 0..8 {
                         let mut xor_arr = [0;4];
-                        
+                        if debugging == true {
+                            println!("________________________________________________________________________");
+                            println!("prev_matrix:{prev_matrix:?}");
+                        }
                         // kolom 0 arr yang di xor kan perlu ada shift dan s box dan di xor
                         if y == 0 {
                             let sub_data = {
@@ -133,6 +133,7 @@ fn main() {
                                 }
                                 sub_data
                             };
+
                             for x in 0..4 {
                                 if x==0{
                                     xor_arr[x] = sub_data[x] ^ rcon[i-1];
@@ -159,6 +160,7 @@ fn main() {
                                 xor_arr[x] = prev_matrix[x][y-1];
                             }
                         }
+
                         // proses xor hasil di taro di prev matrix
                         for x in 0..4 {
                             if debugging == true {
