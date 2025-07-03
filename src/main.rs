@@ -114,15 +114,20 @@ fn main() {
                     let mut prev_matrix = [[0;8]; 4];
                     for x in 0..4 {
                         prev_matrix[x] = [&rkey[i*2-2][x][..],&rkey[i*2-1][x][..]].concat().try_into().unwrap();
+                        if debugging == true {
+                            println!("________________________________________________________________________");
+                            println!("rkey:{prev_matrix:?}");
+                        }   
                     }
                     // buat oprasi matrix per kolom beda beda
                     for y in 0..8 {
                         let mut xor_arr = [0;4];
+                        
                         // kolom 0 arr yang di xor kan perlu ada shift dan s box dan di xor
                         if y == 0 {
                             let sub_data = {
                                 let mut sub_data:[u8;4]=[0;4];
-                                let shifted =shift_columns(debugging, [prev_matrix[0][0],prev_matrix[1][0],prev_matrix[2][2],prev_matrix[3][0]]);
+                                let shifted =shift_columns(debugging, [prev_matrix[0][7],prev_matrix[1][7],prev_matrix[2][7],prev_matrix[3][7]]);
                                 for x in 0..4 {
                                     sub_data[x]=substitution_box(debugging, shifted[x]);
                                 }
@@ -132,6 +137,7 @@ fn main() {
                                 if x==0{
                                     xor_arr[x] = sub_data[x] ^ rcon[i-1];
                                     if debugging == true {
+                                        println!("________________________________________________________________________");
                                         println!("rcon\t: dec :{rc:?}\tbit:{rc:08b}", rc=rcon[i-1]);
                                     }
                                 }else {
@@ -139,6 +145,7 @@ fn main() {
                                 }
                                 if debugging == true {
                                     println!("sub_data\t: dec:{sd:?}\tbit:{sd:08b}", sd=sub_data[x]);
+                                    println!("xor_arr\t: dec:{sd:?}\tbit:{sd:08b}", sd=xor_arr[x]);
                                 }
                             }
                         // kolom 5 hanya s box
@@ -147,7 +154,7 @@ fn main() {
                                 xor_arr[x] = substitution_box(debugging, prev_matrix[x][y-1]);
                             };
                         // kolom selain 1 dan 4
-                        }else {
+                        }else{
                             for x in 0..4 {
                                 xor_arr[x] = prev_matrix[x][y-1];
                             }
@@ -155,12 +162,13 @@ fn main() {
                         // proses xor hasil di taro di prev matrix
                         for x in 0..4 {
                             if debugging == true {
+                                println!("________________________________________________________________________");
                                 println!("prev_matrix\t: dec:{p:?}\tbit:{p:08b}", p=prev_matrix[x][y]);
                             }
                             
                             prev_matrix[x][y] = xor_arr[x] ^ prev_matrix[x][y];
                             if debugging == true {
-                                println!("xor_arr\t: {:08b}", xor_arr[x]);
+                                println!("xor_arr\t: dec:{x:?}\tbit:{x:08b}", x=xor_arr[x]);
                                 println!("current\t: dec:{p:?}\tbit:{p:08b}", p=prev_matrix[x][y]);
                             }
                             
@@ -183,6 +191,7 @@ fn main() {
         }
         // print rkey
         if debugging == true {
+            println!("________________________________________________________________________");
             println!("RCON: {rcon:?}");
             for (index,matrix) in rkey.iter().copied().enumerate() {
                 println!("\nkey matrix ke : {index}");
@@ -198,18 +207,25 @@ fn main() {
     fn shift_columns(debugging: bool, word: [u8; 4])->[u8; 4] {
         let shifted= [word[1], word[2], word[3], word[0]];
         if debugging == true {
+            println!("________________________________________________________________________");
             println!("orgin\t:{word:?}");
             println!("altered\t:{shifted:?}");
         }
         shifted
     }
     // perkalian matrix xor round key dengan matrix
-    fn add_round_key( matrix: [[u8;4]; 4], key: [[u8;4]; 4])->[[u8;4]; 4] {
+    fn add_round_key( debugging: bool, matrix: [[u8;4]; 4], key: [[u8;4]; 4])->[[u8;4]; 4] {
         let mut result = [[0;4]; 4];
         for x in 0..4 {
             for y in 0..4 {
                 result[x][y] = matrix[x][y] ^ key[x][y];
             }
+        }
+        if debugging == true {
+            println!("________________________________________________________________________");
+            println!("matrix\t:{matrix:?}");
+            println!("key\t:{key:?}");
+            println!("result\t:{result:?}");
         }
         result
     }
@@ -241,6 +257,7 @@ fn main() {
         // ambil data substitution box
         let sub_data=sbox[base16][mod16];
         if debugging==true{
+            println!("________________________________________________________________________");
             println!("orgin\t\t:hex:{data:x}\t: dec:{data:?}");
             println!("baris\t\t:{base16:x}");
             println!("kolom\t\t:{mod16:x}");
@@ -250,7 +267,7 @@ fn main() {
         
     }
     // shift rows per baris
-    fn shift_rows(matrix: [[u8; 4]; 4]) -> [[u8; 4]; 4] {
+    fn shift_rows(debugging: bool,matrix: [[u8; 4]; 4]) -> [[u8; 4]; 4] {
         let mut result=[[0;4];4];
         for x in 0..4 {
             let (a,b)=matrix[x].split_at(x);
@@ -263,6 +280,11 @@ fn main() {
                 result[x][y]=a[i];
                 y+=1;
             }
+        }
+        if debugging==true{
+            println!("________________________________________________________________________");
+            println!("awal : {matrix:?}");
+            println!("akhir: {result:?}");
         }
         result
     }
@@ -325,7 +347,7 @@ fn main() {
     // fungsi enkripsi data matric 4x4 dengan rkey 4x4 balikin 4x4 yang sudah dienkripsi
     fn encryption(debugging: bool, mut matrix: [[u8; 4]; 4], rkeys: Vec<[[u8; 4]; 4]>) -> [[u8; 4]; 4] {
         // Initial add_round_key
-        matrix = add_round_key(matrix, rkeys[0]);
+        matrix = add_round_key(debugging ,matrix, rkeys[0]);
         // 13 main rounds
         for i in 1..(rkeys.len() - 1) {
             // SubBytes
@@ -335,11 +357,11 @@ fn main() {
                 }
             }
             // ShiftRows
-            matrix = shift_rows(matrix);
+            matrix = shift_rows(debugging, matrix);
             // MixColumns
             matrix = mix_columns(debugging, matrix);
             // AddRoundKey
-            matrix = add_round_key(matrix, rkeys[i]);
+            matrix = add_round_key(debugging, matrix, rkeys[i]);
         }
         // Final round (no MixColumns)
         // SubBytes
@@ -349,17 +371,17 @@ fn main() {
             }
         }
         // ShiftRows
-        matrix = shift_rows(matrix);
+        matrix = shift_rows(debugging, matrix);
         // AddRoundKey
-        matrix = add_round_key(matrix, rkeys[rkeys.len() - 1]);
+        matrix = add_round_key(debugging, matrix, rkeys[rkeys.len() - 1]);
         matrix
     }
 
     // This is the main program that executes process
     // change value for debugging
     // this is default value
-    let debugging = false;
-    let not_with_value = false;
+    let debugging = true;
+    let not_with_value = true;
 
     // take input
     let bytes_array = convert_input_value_to_bytes(debugging,take_input(not_with_value));
@@ -393,6 +415,19 @@ fn main() {
     let end = r#"}"#;
     // let koma = r#","#;
     print!("{begin} \"cyphertext\" : ");
+    // for (index,data) in encrypted_data_array.iter().enumerate() {
+    //     print!("\n\"data{index}\" : ");
+    //     for (i,matrix) in data.iter().enumerate() {
+    //         // print!("\n\"data{index}{i}\" : ");
+    //         for (j,row) in matrix.iter().enumerate() {
+    //             // print!("\n\t[");
+    //             for (k,col) in row.iter().enumerate() {
+    //                 print!("{:?}",*col as char);
+    //             }
+    //             // print!("\n\t]");
+    //         }
+    //     }
+    // }
     print!("{encrypted_data_array:?}");
     print!("{end}\n");
 }
