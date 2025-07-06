@@ -308,19 +308,19 @@ fn main() {
         for x in 0..4 {
             for y in 0..4 {
                 for z in 0..4 {
-                    let gf = gf256(matrix_multiplication[x][z] as u16,matrix[z][y] as u16);
-                    let res = result[x][y]^gf;
+                    let gf = gf256(matrix_multiplication[z][x] as u16,matrix[y][z] as u16);
+                    let res = result[y][x]^gf;
                     if debugging==true{
                         println!("________________________________________________________________________");
-                        println!("matrix[{x}][{z}]\t\t\t:{m:08b}\t{m:x}\t{m}",m=matrix[x][z]);
-                        println!("matrix_multiplication[{z}][{y}]\t:{m:08b}\t{m:x}\t{m}",m=matrix_multiplication[z][y]);
+                        println!("matrix[{z}][{x}]\t\t\t:{m:08b}\t{m:x}\t{m}",m=matrix[z][x]);
+                        println!("matrix_multiplication[{y}][{z}]\t:{m:08b}\t{m:x}\t{m}",m=matrix_multiplication[y][z]);
                         println!("gf256\t\t\t\t:{g:08b}\t{g:x}\t{g}",g=gf);
-                        println!("awal[{x}][{y}]\t\t\t:{a:08b}\t{a:x}\t{a}",a=result[x][y]);
+                        println!("awal[{y}][{x}]\t\t\t:{a:08b}\t{a:x}\t{a}",a=result[x][x]);
                         println!("xor\t\t\t\t:{r:08b}\t{r:x}\t{r}",r=res);
                     }
                     result[x][y] = res;
                     if debugging==true{
-                        println!("stored[{x}][{y}]\t\t\t:{r:08b}\t{r:x}\t{r}",r=result[x][y]);
+                        println!("stored[{y}][{x}]\t\t\t:{r:08b}\t{r:x}\t{r}",r=result[y][x]);
                         println!("matrix akhir\t\t\t:{result:?}");
                     }
                 }
