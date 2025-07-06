@@ -308,7 +308,7 @@ fn main() {
         for x in 0..4 {
             for y in 0..4 {
                 for z in 0..4 {
-                    let gf = gf258(matrix_multiplication[x][z] as u16,matrix[z][y] as u16);
+                    let gf = gf256(matrix_multiplication[x][z] as u16,matrix[z][y] as u16);
                     let res = result[x][y]^gf;
                     if debugging==true{
                         println!("________________________________________________________________________");
@@ -329,7 +329,7 @@ fn main() {
         result
     }
     // fungsi penghitungan irreducible polinomial
-    fn gf258(x:u16,mut y:u16) -> u8 {      
+    fn gf256(x:u16,mut y:u16) -> u8 {      
         let p:u16 = 0b100011011;        
         let mut m = 0;         
         for _ in 0..8{
