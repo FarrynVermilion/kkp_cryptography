@@ -314,7 +314,7 @@ fn main() {
                         println!("________________________________________________________________________");
                         println!("matrix[{x}][{z}]\t\t\t:{m:08b} {m:x}",m=matrix[x][z]);
                         println!("matrix_multiplication[{z}][{y}]\t:{m:08b} {m:x}",m=matrix_multiplication[z][y]);
-                        println!("gf258\t\t\t\t:{g:08b} {g:x}",g=gf);
+                        println!("gf256\t\t\t\t:{g:08b} {g:x}",g=gf);
                         println!("awal[{x}][{y}]\t\t\t:{a:08b} {a:x}",a=result[x][y]);
                         println!("xor\t\t\t\t:{r:08b} {r:x}",r=res);
                     }
